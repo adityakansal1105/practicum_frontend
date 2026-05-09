@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Change 'YOUR_HF_SPACE_URL' to your actual Hugging Face space URL once deployed
-    const PROD_API = 'https://YOUR_HF_SPACE_URL.hf.space';
+    const PROD_API = 'https://adityakansal1105-practicum-backend.hf.space';
     const isLocal = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
     const API_BASE = isLocal ? 'http://127.0.0.1:8000' : PROD_API;
 
