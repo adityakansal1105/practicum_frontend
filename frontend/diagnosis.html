@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAI - New Diagnosis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .step-label { transition: color 0.3s; }
+        .step-label.active { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <div class="logo-icon"><i class='bx bx-pulse'></i></div>
+            <span>MedAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="diagnosis.html" class="nav-link active">Diagnosis</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="card" style="max-width: 800px; margin: 0 auto;">
+            <h2 class="text-center" style="margin-bottom: 24px;">Complete Your Assessment</h2>
+            
+            <!-- Progress Indicator -->
+            <div style="width: 100%; height: 6px; background: var(--border-light); border-radius: 3px; margin-bottom: 24px; overflow: hidden;">
+                <div id="diag-progress" style="width: 33.33%; height: 100%; background: var(--primary); transition: width 0.4s ease;"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 32px; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                <span id="step-label-1" class="step-label active">1. Basic Details</span>
+                <span id="step-label-2" class="step-label">2. Symptoms</span>
+                <span id="step-label-3" class="step-label">3. Severity</span>
+            </div>
+
+            <form id="diagnosis-form">
+                
+                <!-- STEP 1: Basic Details -->
+                <div id="diag-step-1">
+                    <h3 style="margin-bottom: 16px;">Patient Information</h3>
+                    <div class="input-group">
+                        <label>Full Name <span class="text-red">*</span></label>
+                        <input type="text" id="diag-name" placeholder="e.g. Harshit Malkania " required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="input-group">
+                            <label>Age <span class="text-red">*</span></label>
+                            <input type="number" id="diag-age" placeholder="e.g. 34" min="1" max="120" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Gender <span class="text-red">*</span></label>
+                            <select id="diag-gender" required>
+                                <option value="" disabled selected>Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group mt-2">
+                        <label>Pre-existing Conditions (comma separated)</label>
+                        <input type="text" id="diag-conditions" placeholder="e.g. Diabetes, Asthma">
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-light);">
+                        <button type="button" class="btn btn-primary" onclick="app.nextStep(2)">Next Step <i class='bx bx-right-arrow-alt'></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Symptoms -->
+                <div id="diag-step-2" class="hidden">
+                    <h3 style="margin-bottom: 8px;">Symptom Assessment</h3>
+                    <p class="text-muted" style="margin-bottom: 16px;">Select all symptoms you are currently experiencing.</p>
+                    
+                    <div class="input-group">
+                        <div style="position: relative;">
+                            <i class='bx bx-search' style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 1.2rem;"></i>
+                            <input type="text" id="symptom-search-input" placeholder="Search symptoms..." style="padding-left: 48px;">
+                        </div>
+                    </div>
+
+                    <div class="symptoms-grid" id="symptoms-container" style="max-height: 200px; overflow-y: auto; padding-right: 10px; margin-bottom: 24px;">
+                        <!-- Populated by JS -->
+                    </div>
+                    
+                    <div style="background: var(--bg-color); padding: 16px; border-radius: 12px; border: 1px dashed var(--border-light);">
+                        <h4 style="margin-bottom: 8px; font-size: 0.95rem; color: var(--text-muted);">Selected Symptoms</h4>
+                        <div id="selected-symptoms" class="symptoms-grid">
+                            <span class="text-muted" style="font-size: 0.85rem;">None selected.</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-light);">
+                        <button type="button" class="btn btn-outline" onclick="app.nextStep(1)">Back</button>
+                        <button type="button" class="btn btn-primary" onclick="app.nextStep(3)">Next Step <i class='bx bx-right-arrow-alt'></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Severity -->
+                <div id="diag-step-3" class="hidden">
+                    <h3 style="margin-bottom: 8px;">Severity of Symptoms</h3>
+                    <p class="text-muted" style="margin-bottom: 24px;">How severe are your overall symptoms?</p>
+                    
+                    <div class="grid-3">
+                        <div class="severity-card" onclick="app.selectSeverity('mild')" id="sev-mild">
+                            <div class="sev-icon bg-green"><i class='bx bx-smile'></i></div>
+                            <h4 style="margin-bottom: 8px;">Mild</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Noticeable but doesn't interfere with daily activities</p>
+                        </div>
+                        <div class="severity-card" onclick="app.selectSeverity('moderate')" id="sev-moderate">
+                            <div class="sev-icon bg-yellow"><i class='bx bx-meh'></i></div>
+                            <h4 style="margin-bottom: 8px;">Moderate</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Interferes somewhat with daily activities</p>
+                        </div>
+                        <div class="severity-card" onclick="app.selectSeverity('severe')" id="sev-severe">
+                            <div class="sev-icon bg-red"><i class='bx bx-sad'></i></div>
+                            <h4 style="margin-bottom: 8px;">Severe</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Significantly impacts or prevents daily activities</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-light);">
+                        <button type="button" class="btn btn-outline" onclick="app.nextStep(2)">Back</button>
+                        <button type="submit" class="btn btn-accent btn-large" id="submit-btn">
+                            Get Diagnosis <i class='bx bx-magic-wand'></i>
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <!-- Global Loader -->
+    <div id="global-loader" class="loader-overlay hidden">
+        <div class="spinner"></div>
+        <h3 style="color: white; margin-top: 16px;">Analyzing with AI...</h3>
+        <p style="color: #CBD5E1; margin-top: 8px;">Please wait while we process your symptoms.</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

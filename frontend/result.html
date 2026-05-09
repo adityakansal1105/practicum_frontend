@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAI - Assessment Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border: 8px solid var(--border-light);
+            margin: 0 auto 16px;
+            background: var(--white);
+            color: var(--dark-card);
+            transition: border-color 1s ease;
+        }
+        .score-circle .number { font-size: 2.2rem; font-weight: 700; line-height: 1; }
+        .score-circle .label { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+        .next-steps-list { list-style: none; padding: 0; margin: 0; }
+        .next-steps-list li { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; font-size: 0.95rem; }
+        .next-steps-list i { font-size: 1.2rem; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <div class="logo-icon"><i class='bx bx-pulse'></i></div>
+            <span>MedAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="diagnosis.html" class="nav-link">Diagnosis</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="grid-2">
+            <!-- Results Main -->
+            <div>
+                <h2 id="res-greeting" style="margin-bottom: 8px;">Hello</h2>
+                <p class="text-muted" style="margin-bottom: 32px;">Here is your personalized AI-driven health assessment.</p>
+                
+                <div id="emergency-banner" class="emergency-banner hidden">
+                    <i class='bx bx-error-circle bx-tada'></i>
+                    <div>
+                        <strong>High Severity Alert</strong>
+                        <p>Based on your inputs, we strongly advise seeking immediate medical attention.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <h3 style="margin-bottom: 24px; border-bottom: 1px solid var(--border-light); padding-bottom: 16px;">
+                        <i class='bx bx-check-shield text-primary'></i> Possible Conditions
+                    </h3>
+                    <div id="diseases-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Smart Explanation -->
+                <div class="card bg-blue" style="border: 1px solid rgba(59, 130, 246, 0.2); margin-bottom: 24px;">
+                    <h4 style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; color: var(--primary);">
+                        <i class='bx bx-brain'></i> AI Analysis Explanation
+                    </h4>
+                    <p style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 12px;">Based on your reported symptoms of <strong id="exp-symptoms"></strong>, our machine learning model identified patterns commonly associated with <strong id="exp-disease"></strong>.</p>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Please note that this is a probabilistic prediction model and not a definitive medical diagnosis.</p>
+                </div>
+
+                <!-- Actionable Next Steps -->
+                <div class="card" style="border-top: 4px solid var(--primary);">
+                    <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <i class='bx bx-map-alt text-primary'></i> Recommended Next Steps
+                    </h3>
+                    <ul class="next-steps-list" id="next-steps-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Results Sidebar -->
+            <div>
+                <div class="dark-card" style="position: sticky; top: 100px;">
+                    
+                    <!-- Health Score Widget -->
+                    <div style="text-align: center; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <h3 style="color: white; margin-bottom: 20px;">Overall Health Score</h3>
+                        <div class="score-circle" id="health-score-circle">
+                            <div class="number" id="hs-number">--</div>
+                            <div class="label">out of 100</div>
+                        </div>
+                        <div id="hs-label" class="badge" style="background: rgba(255,255,255,0.1); color: white; font-size: 1rem; padding: 6px 16px;">Processing</div>
+                    </div>
+
+                    <h3 style="margin-bottom: 24px;">Assessment Summary</h3>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px; margin-bottom: 20px;">
+                        <span style="color: #CBD5E1;">Risk Level</span>
+                        <span id="res-risk-badge" class="badge">Processing...</span>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 16px; margin-bottom: 32px; border: 1px solid rgba(255,255,255,0.1);">
+                        <h4 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            <i class='bx bx-bulb text-accent' style="font-size: 1.2rem;"></i> General Advice
+                        </h4>
+                        <p id="res-recommendation" style="color: #E2E8F0; font-size: 0.95rem; line-height: 1.6;">Loading...</p>
+                    </div>
+
+                    <button class="btn btn-primary btn-full btn-large" id="save-btn" onclick="app.saveAndGoDashboard()">
+                        Save & View Dashboard <i class='bx bx-right-arrow-alt'></i>
+                    </button>
+                    <button class="btn btn-outline btn-full mt-4" style="color: white; border-color: rgba(255,255,255,0.3);" onclick="window.location.href='diagnosis.html'">
+                        Start New Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast">An error occurred. Please try again.</div>
+
+    <script src="script.js"></script>
+</body>
+</html>

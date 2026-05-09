@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAI - Healthcare Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <div class="logo-icon"><i class='bx bx-pulse'></i></div>
+            <span>MedAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link active">Home</a>
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="diagnosis.html" class="nav-link">Diagnosis</a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Landing Page Hero -->
+        <div class="hero">
+            <div class="hero-content">
+                <div class="badge">✨ AI-Powered Healthcare</div>
+                <h1>Early Disease Diagnosis,<br><span class="text-gradient">Powered by Intelligence</span></h1>
+                <p>Enter your symptoms and vital details to receive an instant, highly accurate AI-driven health assessment and actionable recommendations.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary btn-large" onclick="window.location.href='diagnosis.html'">
+                        Start Diagnosis <i class='bx bx-right-arrow-alt'></i>
+                    </button>
+                    <button class="btn btn-secondary btn-large" onclick="window.location.href='dashboard.html'">
+                        View Dashboard
+                    </button>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="glass-card floating-1">
+                    <i class='bx bx-check-shield'></i> Your Health Partner
+                </div>
+                <div class="glass-card floating-2">
+                    <i class='bx bx-brain'></i> Advanced AI
+                </div>
+                <div class="hero-image-placeholder">
+                    <div class="pulse-ring"></div>
+                    <i class='bx bx-health'></i>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

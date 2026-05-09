@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAI - Patient Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .trend-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-color);
+            padding: 24px;
+            border-radius: var(--radius-md);
+            margin-bottom: 32px;
+            border: 1px solid var(--border-light);
+        }
+        .trend-text { font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .timeline-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        .timeline-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+            position: relative;
+        }
+        .timeline-node:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            right: -25px;
+            width: 30px;
+            height: 2px;
+            background: var(--border-light);
+            z-index: 0;
+        }
+        .tl-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            z-index: 1;
+            margin-bottom: 8px;
+        }
+        .tl-date { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; text-align: center; }
+        .tl-risk { font-size: 0.85rem; font-weight: 600; text-align: center; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <div class="logo-icon"><i class='bx bx-pulse'></i></div>
+            <span>MedAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="dashboard.html" class="nav-link active">Dashboard</a>
+            <a href="diagnosis.html" class="nav-link">Diagnosis</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;">
+            <div>
+                <h2 style="margin-bottom: 8px;">Patient Dashboard</h2>
+                <p class="text-muted">Overview of your complete assessment history and insights.</p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-outline text-red" style="border-color: rgba(239, 68, 68, 0.5);" onclick="app.clearHistory()">
+                    <i class='bx bx-trash'></i> Clear History
+                </button>
+                <button class="btn btn-outline" onclick="app.downloadReport()">
+                    <i class='bx bx-download'></i> Download Report
+                </button>
+                <button class="btn btn-primary" onclick="window.location.href='diagnosis.html'">
+                    New Diagnosis <i class='bx bx-plus'></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Health Trend Timeline -->
+        <div class="card" style="margin-bottom: 32px;">
+            <h3 style="margin-bottom: 16px;"><i class='bx bx-line-chart text-primary'></i> Your Health Trend</h3>
+            <div class="trend-container">
+                <div id="trend-status" class="trend-text text-muted">
+                    <i class='bx bx-minus-circle'></i> Stable condition
+                </div>
+                <div class="timeline-wrapper" id="timeline-wrapper">
+                    <!-- Populated by JS -->
+                    <span class="text-muted" style="font-size: 0.9rem;">Not enough data for timeline.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights -->
+        <div class="grid-3" style="margin-bottom: 32px;">
+            <div class="stat-card">
+                <div class="stat-icon bg-blue"><i class='bx bx-folder-open'></i></div>
+                <div class="stat-info">
+                    <h4>Total Diagnoses</h4>
+                    <span id="stat-total">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-red"><i class='bx bx-error'></i></div>
+                <div class="stat-info">
+                    <h4>High Risk Cases</h4>
+                    <span id="stat-high-risk">0</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-yellow"><i class='bx bx-pulse'></i></div>
+                <div class="stat-info">
+                    <h4>Medium Risk Cases</h4>
+                    <span id="stat-med-risk">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid-2" style="margin-bottom: 32px;">
+            <div class="stat-card" style="justify-content: center; text-align: center;">
+                <div class="stat-info">
+                    <h4>Most Common Symptom</h4>
+                    <span id="stat-top-symptom" style="font-size: 1.2rem; color: var(--primary);">None</span>
+                </div>
+            </div>
+            <div class="stat-card" style="justify-content: center; text-align: center;">
+                <div class="stat-info">
+                    <h4>Most Frequent Disease</h4>
+                    <span id="stat-top-disease" style="font-size: 1.2rem; color: var(--primary);">None</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Left: History -->
+            <div>
+                <h3 style="margin-bottom: 20px;">Assessment History</h3>
+                <div id="history-list" style="display: flex; flex-direction: column; gap: 16px;">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Right: Disease Search System -->
+            <div>
+                <div class="card" style="position: sticky; top: 100px;">
+                    <h3 style="margin-bottom: 8px;"><i class='bx bx-search-alt-2 text-primary'></i> Disease Lookup</h3>
+                    <p class="text-muted" style="margin-bottom: 20px; font-size: 0.9rem;">Search our medical database for information on any condition.</p>
+                    
+                    <div class="input-group">
+                        <div style="position: relative;">
+                            <input type="text" id="disease-search-input" placeholder="e.g. Asthma, Diabetes..." onkeypress="app.handleSearchKey(event)">
+                            <button onclick="app.searchDisease()" class="btn btn-primary" style="position: absolute; right: 4px; top: 50%; transform: translateY(-50%); padding: 6px 12px; border-radius: 8px;">Search</button>
+                        </div>
+                    </div>
+
+                    <!-- Search Loading State -->
+                    <div id="search-loading" class="hidden text-center" style="padding: 30px;">
+                        <i class='bx bx-loader-alt bx-spin text-primary' style="font-size: 2rem;"></i>
+                        <p class="text-muted mt-2">Searching database...</p>
+                    </div>
+                    
+                    <!-- Search Error State -->
+                    <div id="search-error" class="hidden text-center" style="padding: 20px; color: var(--text-muted); font-size: 0.9rem;">
+                        <!-- Inline error message injected here if needed -->
+                    </div>
+
+                    <!-- Search Results -->
+                    <div id="search-results" class="hidden" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border-light);">
+                        <h4 id="sr-name" style="margin-bottom: 12px; color: var(--primary); font-size: 1.2rem;">Disease Name</h4>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Symptoms:</span>
+                            <div id="sr-symptoms" style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;"></div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Causes:</span>
+                            <div id="sr-causes" style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;"></div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Prevention:</span>
+                            <div id="sr-prevention" style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;"></div>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Basic Treatment:</span>
+                            <div id="sr-treatment" style="font-size: 0.9rem; color: var(--text-muted); margin-top: 4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toast">An error occurred. Please try again.</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
